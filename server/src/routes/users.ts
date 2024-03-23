@@ -10,7 +10,6 @@ router.post(
   [
     check("firstName", "First Name is required").isString(),
     check("lastName", "Last Name is required").isString(),
-    check("country", "Country is required").isString(),
     check("email", "Email is required").isEmail(),
     check("password", "Password with 6 or more characters required").isLength({
       min: 6,
@@ -31,15 +30,16 @@ router.post(
       }
 
       user = new User(req.body);
-      await user.save();
-
+      
       const token = jwt.sign(
         { userId: user.id },
         process.env.JWT_SECRET as string,
         {
           expiresIn: "1d",
         }
-      );
+        );
+        
+        await user.save();
 
       res.cookie("auth_token", token, {
         httpOnly: true,
@@ -51,14 +51,13 @@ router.post(
         _id: user._id,
         firstName: user.firstName,
         lastName: user.lastName,
-        country: user.country,
         email: user.email,
       };
 
       return res.status(200).json({ message: "Registration Successful", user:userResponse});
     } catch (error) {
       console.log(error);
-      res.status(500).json({ message: "Something went Wrong" });
+     return res.status(500).json({ message: "Something went Wrong" });
     }
   }
 );

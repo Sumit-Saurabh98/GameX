@@ -4,7 +4,6 @@ import bcrypt from "bcryptjs"
 export type UserType = {
     firstName : string,
     lastName : string,
-    country: string,
     email : string,
     password : string,
 }
@@ -12,7 +11,6 @@ export type UserType = {
 const userSchema = new mongooose.Schema({
     firstName: {type: String, required: true},
     lastName: {type: String, required: true},
-    country: {type: String, required: true},
     email: {type: String, required: true, unique: true},
     password: {type: String, required: true}
 })
