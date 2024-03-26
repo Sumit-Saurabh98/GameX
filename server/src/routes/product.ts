@@ -26,7 +26,7 @@ router.get("/products/:id?", async (req: Request, res: Response) => {
     const skip = page ? (parseInt(page) - 1) * PAGE_SIZE : 0;
 
     const products = await Product.find().skip(skip).limit(PAGE_SIZE).exec();
-   return res.status(200).json({ data: products });
+    return res.status(200).json({ data: products });
   } catch (error) {
     console.error("Error fetching products:", error);
     res.status(500).json({ message: "Internal Server Error" });
