@@ -6,6 +6,7 @@ import cookieParser from "cookie-parser";
 import userRoutes from "./routes/users"
 import authRoutes from "./routes/auth"
 import connection from "./database/db";
+import productRouter from "./routes/product"
 
 const PORT = process.env.PORT || 5000;
 
@@ -25,6 +26,7 @@ app.use(cookieParser());
 
 app.use('/api/auth', userRoutes)
 app.use('/api/auth', authRoutes)
+app.use('/api', productRouter)
 
 app.listen(PORT, async () => {
   try {

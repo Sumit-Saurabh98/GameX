@@ -8,14 +8,18 @@ export interface Images{
     img5: string,
 }
 
+export interface Specifications{
+  processor: string,
+  windows: string,
+  screen: number,
+  force: string,
+  storage: string
+}
+
 export type ProductType = {
     img: Images,
+    specifications: Specifications,
     title: string,
-    processor: string,
-    windows: string,
-    screen: number,
-    force: string,
-    storage: string,
     price: number,
     cprice: number,
     color: string,
@@ -32,11 +36,13 @@ const productSchema = new mongoose.Schema({
     img5: String,
   },
     title: String,
-    processor: String,
-    windows: String,
-    screen: Number,
-    force: String,
-    storage: String,
+    secifications: {
+      processor: String,
+      windows: String,
+      screen: Number,
+      force: String,
+      storage: String
+    },
     price: Number,
     cprice: Number,
     color: String,
