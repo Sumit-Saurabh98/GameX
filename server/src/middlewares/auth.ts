@@ -1,30 +1,26 @@
-import { NextFunction, Request, Response } from "express";
 import jwt, { JwtPayload } from "jsonwebtoken";
+import { NextFunction, Request, Response } from "express";
 
-declare global {
-  namespace Express {
-    interface Request {
-      userId: string;
-    }
-  }
+interface CustomJwtPayload extends JwtPayload {
+  userId: string;
+  username: string;
 }
 
-const verifyToken = (req: Request, res: Response, next: NextFunction) => {
-  const token = req.cookies["auth_token"];
-
-  if (!token) {
-    return res.status(401).json({ message: "Unauthenticated" });
-  }
-
+const authenticate = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET as string);
+    const token: string = req.cookies.gamexauthtoken;
 
-    req.userId = (decoded as JwtPayload).userId;
+    if (!token) {
+      return res.status(401).json({message:"Please login"});
+    }
 
+    const decoded = jwt.verify(token, process.env.JWT_SECRET as string) as CustomJwtPayload;
+
+    req.userId = decoded.userId;
     next();
   } catch (error) {
-    return res.status(401).json({ message: "unauthorized" });
+    return res.status(500).json({ error: "Internal server error during authentication" });
   }
 };
 
-export default verifyToken;
+export default authenticate;

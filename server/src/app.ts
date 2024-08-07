@@ -1,38 +1,35 @@
 import express from "express";
-import dotenv from "dotenv";
-dotenv.config();
 import cors from "cors";
 import cookieParser from "cookie-parser";
-import userRoutes from "./routes/users"
-import authRoutes from "./routes/auth"
+require('dotenv').config()
 import connection from "./database/db";
-import productRouter from "./routes/product"
+import authRouter from "./routes/authRoutes";
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 3001;
 
 const app = express();
 
-app.use(
-  cors({
-    origin: "*",
-    credentials: true,
-  })
-);
+app.use(cookieParser()); 
+app.use(express.json()); 
+app.use(cors({
+    origin: ['http://localhost:3000', 'http://localhost:3001'],
+    credentials: true
+}));
 
-app.use(express.json({ limit: "16kb" }));
-app.use(express.urlencoded({ extended: true, limit: "16kb" }));
-app.use(express.static("public"));
-app.use(cookieParser());
 
-app.use('/api/auth', userRoutes)
-app.use('/api/auth', authRoutes)
-app.use('/api', productRouter)
+app.use("/user", authRouter)
 
-app.listen(PORT, async () => {
-  try {
-    connection()
-    console.log(`server listening on port ${PORT}`);
-  } catch (error) {
-    console.log(error);
-  }
-});
+
+// app.use((req, res) => {
+//     res.status(404).json({ error: 'Route not found' });
+// });
+
+connection().then(()=>{
+    try {
+        app.listen(PORT, ()=>{
+            console.log(`Server connected to http://localhost:${PORT}`);
+        })
+    } catch (error) {
+        console.log('Cannot connect to the server')
+    }
+}).catch(error => console.log(error));
