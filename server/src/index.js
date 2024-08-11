@@ -1,9 +1,10 @@
 import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
-require('dotenv').config()
-import connection from "./database/db";
-import authRouter from "./routes/authRoutes";
+import dotenv from "dotenv"
+dotenv.config()
+import connection from "./database/db.js"
+import authRouter from "./routes/authRoutes.js"
 
 const PORT = process.env.PORT || 3001;
 
@@ -17,12 +18,16 @@ app.use(cors({
 }));
 
 
-app.use("/user", authRouter)
+app.use("/user", authRouter);
+
+app.get("/test", (req, res) => {
+    res.status(200).json({ message: "Test route" });
+})
 
 
-// app.use((req, res) => {
-//     res.status(404).json({ error: 'Route not found' });
-// });
+app.use((req, res) => {
+    res.status(404).json({ error: 'Route not found' });
+});
 
 connection().then(()=>{
     try {
