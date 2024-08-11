@@ -24,7 +24,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { authContext } from "../../context/AuthContextprovider";
 
 function Signin() {
-  const { toggleAuth } = useContext(authContext);
+  const { toggleAuthTrue, toggleAuthFalse } = useContext(authContext);
   const [show, setShow] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -44,11 +44,9 @@ function Signin() {
           password,
         }, {withCredentials: true});
 
-        console.log(response);
-
         // Assuming the response contains a token or user data
         if (response.data) {
-          toggleAuth(); // Call toggleAuth to update auth context
+          toggleAuthTrue(); // Call toggleAuth to update auth context
           toast({
             title: response.data.message,
             status: "success",
@@ -58,6 +56,7 @@ function Signin() {
           navigate("/"); 
         }
       } catch (error) {
+        toggleAuthFalse(); // Call toggleAuth to
         toast({
           title: "Login failed",
           status: "error",

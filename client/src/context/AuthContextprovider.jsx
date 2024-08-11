@@ -1,11 +1,10 @@
-import React, { createContext, useState, useEffect } from 'react';
+import React, { createContext, useState } from 'react';
 
 
 
 export const authContext = createContext();
 
 function AuthContextProvider({ children }) {
-    const [auth, setAuth] = useState(false);
     const [price, setPrice] = useState(0);
     const [item, setItem] = useState(1)
 
@@ -17,26 +16,24 @@ function AuthContextProvider({ children }) {
         setItem(i)
     }
 
-    useEffect(() => {
-        const token = localStorage.getItem("token");
-        if (token) {
-            setAuth(true);
-        }
-    }, []); 
+    
 
-    const logOut = () => {
-        localStorage.clear();
-        setAuth(false);
-    }
+   const toggleAuthTrue = () => {
+   localStorage.setItem("gamexAuth", "true");
+}
 
-    const toggleAuth = () => {
-        setAuth(true)
-    }
+const toggleAuthFalse = () => {
+    localStorage.removeItem("gamexAuth");
+}
+
+const setUserRole = () => {
+    localStorage.setItem("userRole", "seller");
+}
 
 
     
 
-    const value = { auth, logOut, toggleAuth, price, changePrice, item, changeTotalItem };
+    const value = { toggleAuthTrue, toggleAuthFalse, setUserRole, price, changePrice, item, changeTotalItem };
     
     return (
         <authContext.Provider value={value}>

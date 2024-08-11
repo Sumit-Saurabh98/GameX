@@ -10,6 +10,7 @@ import ProductsDetails from "../Components/ProductsDetails/ProductsDetails";
 import { Signin } from "../Components/SignUp_SignIn/Signin";
 import { Signup } from "../Components/SignUp_SignIn/Signup";
 import { Footer } from "../Components/Footer/Footer";
+import SellerOnboard from "../Components/seller/SellerOnboard";
 export function AllRoutes() {
   return (
     <>
@@ -24,6 +25,7 @@ export function AllRoutes() {
         <Route path="/payment" element={<Payments />} />
         <Route path="/cart" element={<Cart/>} />
         <Route path="/successfulPayment" element={<SucessPage />} />
+        <Route path="/selleronboard" element={<SellerOnboard />} />
       </Routes>
       <Footer />
     </>

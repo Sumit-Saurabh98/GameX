@@ -29,14 +29,17 @@ import { authContext } from "../../context/AuthContextprovider";
 import axios from "axios";
 export function OnclickCart() {
   const navigate = useNavigate();
-  const { auth } = useContext(authContext);
+  const { toggleAuthFalse, toggleAuthTrue, setUserRole } = useContext(authContext);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const btnRef = useRef();
+
+  const seller = false;
 
   const toast = useToast()
 
   const borderColor = "#888";
   const [animationInterval, setAnimationInterval] = useState(null);
+
 
   const handleLogout = async () => {
     try {
@@ -44,15 +47,19 @@ export function OnclickCart() {
       console.log(response);
 
       if (response.data) {
+        setUserRole()
+        toggleAuthFalse();
+        onClose()
         toast({
           title: response.data.message,
           status: "success",
           duration: 2000,
           isClosable: true,
         });
-        navigate("/login"); // Redirect to the login page
+        navigate("/"); // Redirect to the login page
       }
     } catch (error) {
+      toggleAuthTrue();
       toast({
         title: "Logout failed",
         status: "error",
@@ -61,6 +68,26 @@ export function OnclickCart() {
       });
     }
   };
+
+  const handleRoleChange = async () => {
+    try {
+      const response = await axios.post("http://localhost:8080/user/change-user-role", {}, {withCredentials: true});
+
+      if (response.data) {
+        toggleAuthTrue();
+        onClose()
+        toast({
+          title: response.data.message,
+          status: "success",
+          duration: 2000,
+          isClosable: true,
+        });
+        navigate("/"); 
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
 
   useEffect(() => {
     if (!isOpen && animationInterval) {
@@ -156,21 +183,29 @@ export function OnclickCart() {
             </Button>
             <Divider orientation="horizontal" />
 
-            <Button
+            {localStorage.getItem("userRole")==="seller" ? (
+              <Button
               _hover={{ color: "rgb(69,214,43)" }}
               color="white"
               leftIcon={<FaStore boxSize={6} />}
               variant="liqued"
-              onClick={()=>{
-                  navigate("/store")
-                  onClose()
-                }}
             >
-              Store
+              Go To Shop
             </Button>
+            ):(<Button
+              _hover={{ color: "rgb(69,214,43)" }}
+              color="white"
+              leftIcon={<FaStore boxSize={6} />}
+              variant="liqued"
+              onClick={
+                  handleRoleChange
+                }
+            >
+              Become Seller
+            </Button>)}
             <Divider orientation="horizontal" />
 
-            {auth ? (
+            {localStorage.getItem("gamexAuth")==="true" ? (
               <Button
                 _hover={{ color: "rgb(69,214,43)" }}
                 color="white"
@@ -178,7 +213,7 @@ export function OnclickCart() {
                 variant="liqued"
                 onClick={() => {
                   handleLogout();
-                  onClose();
+                  // onClose();
                 }}
               >
                 Log out
