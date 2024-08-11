@@ -16,8 +16,8 @@ export function AllRoutes() {
       <Bothnavs />
       <Routes>
         <Route path="/" element={<HomePage />} />
-        <Route path="/store" element={<ProductPage />} />
-        <Route path="/signin" element={<Signin />} />
+        <Route path="/shop" element={<ProductPage />} />
+        <Route path="/login" element={<Signin />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/laptops" element={<Pc />} />
         <Route path="/productDetails/:id" element={<ProductsDetails />} />

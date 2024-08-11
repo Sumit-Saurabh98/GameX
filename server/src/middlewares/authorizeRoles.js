@@ -4,7 +4,7 @@ const JWT_ACCESS_SECRET = process.env.JWT_ACCESS_SECRET;
 
 function authorizeRoles(roles = []) {
     return (req, res, next) => {
-        const authHeader = req.headers.authorization;
+        const authHeader = req.cookies.accessToken;
         if (!authHeader) {
             return res.status(401).json({ message: "Authorization header is missing" });
         }

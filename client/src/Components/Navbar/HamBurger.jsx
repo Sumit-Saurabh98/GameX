@@ -19,10 +19,11 @@ import { Header } from "./Header";
 import { HamburgerIcon } from "@chakra-ui/icons";
 import { HmBurgerSearch } from "./HmBurgerSearch";
 import { OnclickCart } from "./OnclickCart";
+import { Link } from "react-router-dom";
 
 export function HamBurger() {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const [placement, setPlacement] = React.useState("left");
+  const placement = "left";
 
   return (
     <div style={{ backgroundColor: "black" }}>
@@ -60,13 +61,15 @@ export function HamBurger() {
             <HmBurgerSearch />
             <VStack>
               <Divider orientation="horizontal" />
+              <Link to="/shop">
               <Text
                 _hover={{ color: "rgb(69,214,43)", cursor: "pointer" }}
                 fontSize="20px"
                 color="white"
               >
-                Store
+                Shop
               </Text>
+              </Link>
               <Divider orientation="horizontal" />
               <Text
                 _hover={{ color: "rgb(69,214,43)", cursor: "pointer" }}

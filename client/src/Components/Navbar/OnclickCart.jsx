@@ -16,26 +16,50 @@ import {
   Icon,
   Center,
   Text,
+  useToast,
 } from "@chakra-ui/react";
 import { VscAccount } from "react-icons/vsc";
 import { FiShoppingCart } from "react-icons/fi";
 import { SlDiamond } from "react-icons/sl";
-import { BsBox, BsBoxArrowRight } from "react-icons/bs";
+import { BsBox, BsBoxArrowRight, BsBoxArrowLeft } from "react-icons/bs";
 import { BsFillCartPlusFill } from "react-icons/bs";
+import { FaStore } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import { authContext } from "../../context/AuthContextprovider";
+import axios from "axios";
 export function OnclickCart() {
   const navigate = useNavigate();
-  const { auth, logOut } = useContext(authContext);
+  const { auth } = useContext(authContext);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const btnRef = useRef();
 
-  const [borderColor, setBorderColor] = useState("#888");
+  const toast = useToast()
+
+  const borderColor = "#888";
   const [animationInterval, setAnimationInterval] = useState(null);
 
-  const handleLogout = () => {
-    logOut();
-    navigate("/");
+  const handleLogout = async () => {
+    try {
+      const response = await axios.post("http://localhost:8080/user/logout", {}, {withCredentials: true});
+      console.log(response);
+
+      if (response.data) {
+        toast({
+          title: response.data.message,
+          status: "success",
+          duration: 2000,
+          isClosable: true,
+        });
+        navigate("/login"); // Redirect to the login page
+      }
+    } catch (error) {
+      toast({
+        title: "Logout failed",
+        status: "error",
+        duration: 2000,
+        isClosable: true,
+      });
+    }
   };
 
   useEffect(() => {
@@ -43,6 +67,7 @@ export function OnclickCart() {
       clearInterval(animationInterval);
       setAnimationInterval(null);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen]);
   return (
     <>
@@ -96,7 +121,10 @@ export function OnclickCart() {
               color="white"
               leftIcon={<BsBox boxSize={6} />}
               variant="liqued"
-              onClick={onClose}
+              onClick={()=>{
+                  navigate("/orders")
+                  onClose()
+                }}
             >
               Orders
             </Button>
@@ -106,9 +134,12 @@ export function OnclickCart() {
               color="white"
               leftIcon={<VscAccount boxSize={6} />}
               variant="liqued"
-              onClick={onClose}
+              onClick={()=>{
+                  navigate("/profile")
+                  onClose()
+                }}
             >
-              Account
+              Profile
             </Button>
             <Divider orientation="horizontal" />
             <Button
@@ -116,9 +147,26 @@ export function OnclickCart() {
               color="white"
               leftIcon={<SlDiamond boxSize={6} />}
               variant="liqued"
-              onClick={onClose}
+              onClick={()=>{
+                  navigate("/rewards")
+                  onClose()
+                }}
             >
-              RazerStore Rewars
+              Rewards
+            </Button>
+            <Divider orientation="horizontal" />
+
+            <Button
+              _hover={{ color: "rgb(69,214,43)" }}
+              color="white"
+              leftIcon={<FaStore boxSize={6} />}
+              variant="liqued"
+              onClick={()=>{
+                  navigate("/store")
+                  onClose()
+                }}
+            >
+              Store
             </Button>
             <Divider orientation="horizontal" />
 
@@ -139,11 +187,11 @@ export function OnclickCart() {
               <Button
                 _hover={{ color: "rgb(69,214,43)" }}
                 color="white"
-                leftIcon={<BsBoxArrowRight boxSize={6} />}
+                leftIcon={<BsBoxArrowLeft boxSize={6} />}
                 variant="liqued"
                 onClick={onClose}
               >
-                <Link to={"/signin"}>Log in</Link>
+                <Link to={"/login"}>Log in</Link>
               </Button>
             )}
           </DrawerBody>

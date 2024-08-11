@@ -71,22 +71,36 @@ export const login = async (req, res) => {
     const accessToken = jwt.sign(
       { userId: user._id, username: user.username, roles: user.roles },
       JWT_ACCESS_SECRET,
-      { expiresIn: "30m" }
+      { expiresIn: "15m" } // Increased to 15 minutes
     );
 
     const refreshToken = jwt.sign(
       { userId: user._id, username: user.username },
       JWT_REFRESH_SECRET,
-      { expiresIn: "1w" }
+      { expiresIn: "7d" }
     );
 
     user.refreshToken = refreshToken;
     await user.save();
 
+    // Set cookies for access and refresh tokens
+    res.cookie("accessToken", accessToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      maxAge: 15 * 60 * 1000, // 15 minutes
+      sameSite: "Lax",
+    });
+
+    res.cookie("refreshToken", refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "Lax",
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+    });
+
     return res.status(200).json({
       message: "Login Successful",
-      accessToken,
-      refreshToken,
+      accessToken, // Consider removing this if you're using HttpOnly cookies
       id: user._id,
       name: user.username,
       profileImageUrl: user.profileImage,
@@ -97,11 +111,11 @@ export const login = async (req, res) => {
     return res.status(500).json({ message: "Internal server error during login" });
   }
 };
-
 export const logout = async (req, res) => {
   try {
     const userId = req.userId;
-    const token = req.headers.authorization?.split(' ')[1];
+    const token = req.cookies.accessToken;
+    console.log(userId, "userId", token, "accessToken");
 
     if (!userId || !token) {
       return res.status(401).json({ message: "User not authenticated" });
@@ -163,7 +177,7 @@ export const generateRefreshToken = async (req, res) => {
     const newAccessToken = jwt.sign(
       { userId: user._id, username: user.username, roles: user.roles },
       JWT_ACCESS_SECRET,
-      { expiresIn: "30m" }
+      { expiresIn: "30s" }
     );
 
     const newRefreshToken = jwt.sign(
@@ -206,7 +220,7 @@ export const changeUserRole = async (req, res) => {
     const accessToken = jwt.sign(
       { userId: user._id, username: user.username, roles: user.roles },
       JWT_ACCESS_SECRET,
-      { expiresIn: "30m" }
+      { expiresIn: "30s" }
     );
 
     const refreshToken = jwt.sign(
@@ -226,6 +240,6 @@ export const changeUserRole = async (req, res) => {
     });
   } catch (error) {
     console.error("Change role error:", error);
-    return res.status(500).json({ message: "Internal server error" });
+    return res.status(500).json({ message: "Internal server errorrrr" });
   }
 };

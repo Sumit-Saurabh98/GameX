@@ -1,6 +1,4 @@
-import React from "react";
-import { Navbar } from "../Navbar/Navbar";
-import { useState } from "react";
+import React, { useState, useContext } from "react";
 import axios from "axios";
 import {
   Box,
@@ -15,106 +13,99 @@ import {
   Icon,
   HStack,
   Divider,
-  useToast
+  useToast,
+  Spinner,
 } from "@chakra-ui/react";
 import { BsFacebook, BsTwitch } from "react-icons/bs";
 import { AiFillGoogleCircle } from "react-icons/ai";
 import { FiEye, FiEyeOff } from "react-icons/fi";
 import { SiAccenture } from "react-icons/si";
 import { useNavigate, Link } from "react-router-dom";
-import { useContext } from "react";
 import { authContext } from "../../context/AuthContextprovider";
-function Signin(props) {
 
-  const {toggleAuth} = useContext(authContext)
-  //eye button
-  const [show, setShow] = React.useState(false);
+function Signin() {
+  const { toggleAuth } = useContext(authContext);
+  const [show, setShow] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false); // Loading state
   const navigate = useNavigate();
+  const toast = useToast();
 
-  const toast = useToast()
+  const handleClick = () => setShow(!show);
 
-  const proceedLogin = (e) => {
+  const proceedLogin = async (e) => {
     e.preventDefault();
     if (validation()) {
-      axios
-      .post("http://localhost:8080/user/login", { email, password })
-      .then((response) => {
-        const user = response.data; 
-        localStorage.setItem("token", user.token);
-        if (user) {
-          toggleAuth()
+      setLoading(true); // Set loading to true before API call
+      try {
+        const response = await axios.post("http://localhost:8080/user/login", {
+          email,
+          password,
+        }, {withCredentials: true});
+
+        console.log(response);
+
+        // Assuming the response contains a token or user data
+        if (response.data) {
+          toggleAuth(); // Call toggleAuth to update auth context
           toast({
-          title: 'Login Successful',
-          status: 'success',
-          duration: 2000,
-          isClosable: true,
-        })
-          navigate("/");
-        } else {
-         toast({
-          title: 'Invalid email or password',
-          status: "error",
-          duration: 2000,
-          isClosable: true,
-        })
+            title: response.data.message,
+            status: "success",
+            duration: 2000,
+            isClosable: true,
+          });
+          navigate("/"); 
         }
-      })
-      .catch((error) => {
-       toast({
-          title: 'Login failed due to server error',
+      } catch (error) {
+        toast({
+          title: "Login failed",
           status: "error",
           duration: 2000,
           isClosable: true,
-        })
-      });
+        });
+      } finally {
+        setLoading(false); // Reset loading state after API call
+      }
     }
   };
 
-  //validation
   const validation = () => {
     let result = true;
-    let errormessage = "Please enter your ";
-    if (email === null || email === "") {
+    let errorMessage = "Please enter your ";
+    if (!email) {
       result = false;
-      errormessage += " Email";
+      errorMessage += " Email";
     }
-    if (password === null || password === "") {
+    if (!password) {
       result = false;
-      errormessage += " Password";
+      errorMessage += " Password";
     }
     if (!result) {
       toast({
-          title: errormessage,
-          status: "warning",
-          duration: 2000,
-          isClosable: true,
-        })
-    } else {
-      if (email.includes("@")) {
-      } else {
-        result = false;
-        toast({
-          title: "Please enter the valid email",
-          status: "warning",
-          duration: 2000,
-          isClosable: true,
-        })
-      }
+        title: errorMessage,
+        status: "warning",
+        duration: 2000,
+        isClosable: true,
+      });
+    } else if (!email.includes("@")) {
+      result = false;
+      toast({
+        title: "Please enter a valid email",
+        status: "warning",
+        duration: 2000,
+        isClosable: true,
+      });
     }
     return result;
   };
 
-  const handleClick = () => setShow(!show); //eye
-
   return (
     <div
       style={{
-        backgroundImage:
-          "url(https://razerid-assets.razerzone.com/static/media/serpents-eye-v2-20220906.dae1e41f.jpg)",
+        backgroundImage: "url(https://razerid-assets.razerzone.com/static/media/serpents-eye-v2-20220906.dae1e41f.jpg)",
         backgroundPosition: "center top -150px",
-        height: "100vh", // move image 50px up from the center
+        height: "100vh",
       }}
     >
       <Center>
@@ -136,19 +127,19 @@ function Signin(props) {
           >
             RAZER ID LOGIN
           </Heading>
-          <form>
+          <form onSubmit={proceedLogin}>
             <Input
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               mb="20px"
               width="375px"
               ml={"20px"}
-              isRequired="true"
+              isRequired
               focusBorderColor="rgb(69,214,43)"
               color={"white"}
               type="email"
               placeholder="EMAIL ADDRESS"
-            ></Input>
+            />
             <InputGroup size="md">
               <Input
                 value={password}
@@ -169,9 +160,9 @@ function Signin(props) {
                   onClick={handleClick}
                 >
                   {show ? (
-                    <Icon boxSize={7} as={FiEye}></Icon>
+                    <Icon boxSize={7} as={FiEye} />
                   ) : (
-                    <Icon boxSize={7} as={FiEyeOff}></Icon>
+                    <Icon boxSize={7} as={FiEyeOff} />
                   )}
                 </Button>
               </InputRightElement>
@@ -183,7 +174,6 @@ function Signin(props) {
               mr={5}
               mb={8}
               textAlign={"right"}
-              text
               fontWeight={"light"}
               color={"white"}
             >
@@ -192,12 +182,13 @@ function Signin(props) {
 
             <Center>
               <Button
-                onClick={proceedLogin}
+                type="submit" // Ensure the button submits the form
                 colorScheme="green"
                 color="black"
                 px="160px"
+                isLoading={loading} // Disable button if loading
               >
-                LOG IN
+                {loading ? <Spinner size="sm" /> : "LOG IN"}
               </Button>
             </Center>
             <Center>
@@ -209,7 +200,7 @@ function Signin(props) {
               <Button
                 _hover={{ color: "rgb(69,214,43)" }}
                 color={"white"}
-                rightIcon={<SiAccenture sixe="12px" />}
+                rightIcon={<SiAccenture size="12px" />}
                 colorScheme="blue"
                 variant="unstyled"
               >
@@ -228,21 +219,21 @@ function Signin(props) {
                 colorScheme="facebook"
                 variant="solid"
                 aria-label="Facebook"
-              ></Button>
+              />
               <Button
                 px="45px"
                 leftIcon={<AiFillGoogleCircle boxSize="30" />}
                 colorScheme="gray"
                 variant="solid"
                 aria-label="Google"
-              ></Button>
+              />
               <Button
                 px="45px"
                 leftIcon={<BsTwitch boxSize="30" />}
                 colorScheme="purple"
                 variant="solid"
                 title="Twitch"
-              ></Button>
+              />
             </Stack>
           </form>
         </Box>

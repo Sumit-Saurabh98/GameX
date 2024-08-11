@@ -6,9 +6,7 @@ import {
   Flex,
   Wrap,
   WrapItem,
-  Button,
   Image,
-  useDisclosure,
 } from "@chakra-ui/react";
 import { SearchModal } from "./SearchModal";
 import {OnclickCart} from "./OnclickCart"
@@ -44,22 +42,24 @@ function Navbar(props) {
               </Link>
             </WrapItem>
             <WrapItem pr="60px">
-              <Link to="./store">
+              <Link to="/shop">
                 <Text
                   _hover={{ color: "white", cursor: "pointer" }}
                   color="#888888"
                 >
-                  Store
+                  Shop
                 </Text>
               </Link>
             </WrapItem>
             <WrapItem pr="60px">
+              <Link to="/pc">
               <Text
                 _hover={{ color: "white", cursor: "pointer" }}
                 color="#888888"
               >
                 PC
               </Text>
+              </Link>
             </WrapItem>
             <WrapItem pr="60px">
               <Text

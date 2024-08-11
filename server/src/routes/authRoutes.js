@@ -6,7 +6,7 @@ import { checkBlacklist } from "../middlewares/checkBlacklist.js";
 
 const router = Router();
 
-router.post('/register', signup)
+router.post('/signup', signup)
 router.post('/login', login)
 router.post('/logout', checkBlacklist, authenticate, logout)
 router.post('/refresh-token', checkBlacklist, authenticate, generateRefreshToken)
