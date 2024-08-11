@@ -71,7 +71,7 @@ export const login = async (req, res) => {
     const accessToken = jwt.sign(
       { userId: user._id, username: user.username, roles: user.roles },
       JWT_ACCESS_SECRET,
-      { expiresIn: "30s" }
+      { expiresIn: "30m" }
     );
 
     const refreshToken = jwt.sign(
@@ -163,7 +163,7 @@ export const generateRefreshToken = async (req, res) => {
     const newAccessToken = jwt.sign(
       { userId: user._id, username: user.username, roles: user.roles },
       JWT_ACCESS_SECRET,
-      { expiresIn: "30s" }
+      { expiresIn: "30m" }
     );
 
     const newRefreshToken = jwt.sign(
@@ -183,5 +183,49 @@ export const generateRefreshToken = async (req, res) => {
   } catch (error) {
     console.error('Refresh token error:', error);
     return res.status(500).json({ message: "Internal server error during token refresh" });
+  }
+};
+
+export const changeUserRole = async (req, res) => {
+  try {
+    // Find the user by ID
+    const user = await User.findById(req.userId); // Use userId from the request body
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Check if the new role already exists
+    if (!user.roles.includes("admin")) {
+      // Update the user's role
+      user.roles.push("admin"); // Add the new role
+    }
+
+    await user.save(); // Save the updated user
+
+    // Generate new access and refresh tokens
+    const accessToken = jwt.sign(
+      { userId: user._id, username: user.username, roles: user.roles },
+      JWT_ACCESS_SECRET,
+      { expiresIn: "30m" }
+    );
+
+    const refreshToken = jwt.sign(
+      { userId: user._id, username: user.username },
+      JWT_REFRESH_SECRET,
+      { expiresIn: "7d" }
+    );
+
+    // Update the refresh token in the database
+    user.refreshToken = refreshToken;
+    await user.save();
+
+    return res.status(200).json({
+      message: "Role changed successfully",
+      accessToken,
+      refreshToken,
+    });
+  } catch (error) {
+    console.error("Change role error:", error);
+    return res.status(500).json({ message: "Internal server error" });
   }
 };

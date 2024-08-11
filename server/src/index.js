@@ -5,6 +5,7 @@ import dotenv from "dotenv"
 dotenv.config()
 import connection from "./database/db.js"
 import authRouter from "./routes/authRoutes.js"
+import authorizeRoles from "./middlewares/authorizeRoles.js";
 
 const PORT = process.env.PORT || 3001;
 
@@ -20,7 +21,7 @@ app.use(cors({
 
 app.use("/user", authRouter);
 
-app.get("/test", (req, res) => {
+app.get("/test", authorizeRoles(["admin"]), async (req, res) => {
     res.status(200).json({ message: "Test route" });
 })
 
